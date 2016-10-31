@@ -1,0 +1,35 @@
+{
+  "name": "express-single-resource",
+  "version": "0.2.0",
+  "description": "Express single resource server",
+  "main": "express-single-resource.js",
+  "scripts": {
+    "lint": "eslint **/*.js",
+    "pretest": "npm run lint",
+    "test": "mocha",
+    "build": "npm install",
+    "dev": "npm install --save-dev",
+    "watch": "npm run test -- -w",
+    "start": "node ./lib/express-single-resource.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/markgreenwood/express-single-resource.git"
+  },
+  "author": "@markgreenwood",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/markgreenwood/express-single-resource/issues"
+  },
+  "homepage": "https://github.com/markgreenwood/express-single-resource#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
+    "eslint": "^3.8.1",
+    "mocha": "^3.1.2"
+  },
+  "dependencies": {
+    "express": "^4.14.0",
+    "sander": "^0.5.1"
+  }
+}
