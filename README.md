@@ -1,55 +1,39 @@
-# Bitmap transformer
+# HTTP (Express) single resource server with persistence
 
 ## Description
 
-TODO: Add program description.
-
-## Code Example
-
-```
-const Bitmap = require('./lib/bitmap-xfmr');
-let myBmp = new Bitmap('example-bitmap.bmp', (err) => { console.log(err || 'Done!'); });
-myBmp.transform('redder', 3);
-myBmp.writeBufferToFile('images/example-redder3.bmp', (err) => { console.log(err || 'Done writing!'); });
-```
+This HTTP server performs CRUD (create/read/update/delete) operations on 
+different resource types. Resource types could be, for example, notes, 
+dogs, cats, cars, etc. The resource type is specified as the first part 
+of the URL path, and specific resources may be referred to by passing 
+them in the second part of the URL path. A resource can be any JSON object
+as long as it has the property "id" that will be used to refer to the 
+stored object for updating, retrieval, or deleting.
 
 ## Motivation
 
-This was written as a lab assignment for Code Fellows 401 class. Currently it supports paletted and non-paletted bitmaps in the standard Windows NT/3.1+ BITMAPINFOHEADER format.
+This was written as a lab assignment for Code Fellows 401 class. The 
+code was refactored to generalize data storage for arbitrary object types, 
+as well as to make it more modular so it's easier to grow and maintain.
 
 ## API Reference
 
-### Constructor
+`GET http://<hostname>/notes` returns all notes resources as JSON objects
 
-```myBmp = new Bitmap(filename, [callback(err, data)]);```
+`GET http://<hostname>/notes/:id` returns the note at a specific id as JSON
 
-Construct a new Bitmap from the data in filename.
+`POST http://<hostname>/cats` with a cat object (as JSON) stored on the message body stores 
+the cat object at its specified id. A cat object might be in the form 
+{ id: "cat1", name: "Garfield", breed: "Tabby" }. In this case "id" needs to be specified
+in the object since we're creating new storage for it.
 
-### Transformer
+`PUT http://<hostname>/dog/:id` with content (as JSON) stored on the message body replaces 
+the content of the dog object at id. New content for an existing dog object 
+{ id: "dog2", name: "Shadow", breed: "Australian Shepard" } might be in the form 
+{ breed: "Flat-Coated Retriever" }. The only restriction is the PUT data should not contain
+"id" since that's specified in the request - we're updating data, not changing the id.
 
-```myBmp.transform(label, [arguments])```
-
-Transform the bitmap where label is one of the available transforms:
- - 'redder' makes the image redder by a specified factor
- - 'bluer' makes the image bluer...
- - 'greener' makes the image greener...
- - 'invert' inverts the colors in the image (i.e. new_color = 255 - old_color)
- - 'grayscale' makes the image grayer by a specified factor
-
-Example:
-
-```
-myBmp.transform('redder', 3);
-myBmp.writeBufferToFile('images/redder3.bmp', (err) => {
-  console.log(err || 'Done!');
-});
-```
-
-### Save to file
-
-```myBmp.writeBufferToFile(filename, [callback(err, data)])```
-
-Write the Bitmap object's buffer out to a .bmp file.
+`DELETE http://<hostname>/car/:id` removes the car object at id from the server.
 
 ## Tests
 
