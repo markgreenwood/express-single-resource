@@ -40,29 +40,29 @@ describe ('Server integration tests', function() {
 
   describe ('HTTP GET', () => {
 
-    it ('"/notes" returns all notes', (done) => {
+    it ('"/api/notes" returns all notes', (done) => {
       request
-        .get('/notes')
+        .get('/api/notes')
         .end((err, res) => {
           expect(res.body).to.deep.equal(testNotes.slice(0,3));
           done(err);
         });
     });
 
-    it ('"/notes/:resourcename" returns that resource (note)', (done) => {
+    it ('"/api/notes/:resourcename" returns that resource (note)', (done) => {
       request
-        .get('/notes/testfile1')
+        .get('/api/notes/testfile1')
         .end((err, res) => {
           expect(res.body).to.deep.equal(testNotes[0]);
           done(err);
         });
     });
 
-    it ('"/invalidpath" returns a 404 error', (done) => {
+    it ('"/api/invalidpath" returns a 400 error', (done) => {
       request
-        .get('/invalidpath')
+        .get('/api/invalidpath')
         .end((err, res) => {
-          expect(res).to.have.status(404);
+          expect(res).to.have.status(400);
           done();
         });
     });
@@ -81,14 +81,14 @@ describe ('Server integration tests', function() {
 
   describe ('HTTP POST', () => {
 
-    it (`"/notes" with ${JSON.stringify(testNotes[3])} stores that content in the store`, (done) => {
+    it (`"/api/notes" with ${JSON.stringify(testNotes[3])} stores that content in the store`, (done) => {
       request
-        .post('/notes')
+        .post('/api/notes')
         .send(testNotes[3])
         .end((err) => {
           if (err) done(err);
           request
-            .get(`/notes/${testNotes[3].id}`)
+            .get(`/api/notes/${testNotes[3].id}`)
             .end((err, res) => {
               expect(res.body).to.deep.equal(testNotes[3]);
               done(err);
@@ -100,15 +100,15 @@ describe ('Server integration tests', function() {
 
   describe ('HTTP PUT', () => {
 
-    it ('"/notes/:resourcename" with { noteBody: "This is new content." } stores that content in resourcename', (done) => {
+    it ('"/api/notes/:resourcename" with { noteBody: "This is new content." } stores that content in resourcename', (done) => {
       request
-        .put(`/notes/${testNotes[2].id}`)
+        .put(`/api/notes/${testNotes[2].id}`)
         .send({ noteBody: 'This is new content.' })
         .end((err, res) => {
           if (err) done(err);
           expect(res.text).to.equal(`Stored note as ${testNotes[2].id}`);
           request
-            .get(`/notes/${testNotes[2].id}`)
+            .get(`/api/notes/${testNotes[2].id}`)
             .end((err, res) => {
               if (err) done(err);
               expect(res.body).to.deep.equal({ id: 'testfile3', noteBody: 'This is new content.' });
@@ -119,13 +119,13 @@ describe ('Server integration tests', function() {
 
     it ('request to update an object where update data contains "id" should generate an error', (done) => {
       request
-        .put(`/notes/${testNotes[2].id}`)
+        .put(`/api/notes/${testNotes[2].id}`)
         .send({ id: 'bogusid', noteBody: 'This is bad content.' })
         .end((err, res) => {
           // if (err) done(err);
           expect(res).to.have.status(400);
           request
-            .get(`/notes/${testNotes[2].id}`)
+            .get(`/api/notes/${testNotes[2].id}`)
             .end((err, res) => {
               if (err) done(err);
               expect(res.body).to.deep.equal({ id: 'testfile3', noteBody: 'This is new content.' });
@@ -138,9 +138,9 @@ describe ('Server integration tests', function() {
 
   describe ('HTTP DELETE', () => {
 
-    it ('"/notes/:resourcename" removes resourcename from the store', (done) => {
+    it ('"/api/notes/:resourcename" removes resourcename from the store', (done) => {
       request
-        .del(`/notes/${testNotes[3].id}`)
+        .del(`/api/notes/${testNotes[3].id}`)
         .end((err, res) => {
           expect(res.text).to.equal(`Deleted note ${testNotes[3].id}`);
           done(err);
@@ -149,25 +149,16 @@ describe ('Server integration tests', function() {
 
     it ('removed resource is really gone', (done) => {
       request
-        .get('/notes/testfile4')
+        .get('/api/notes/testfile4')
         .end((err, res) => {
           expect(res).to.have.status(404);
           done();
         });
     });
 
-    it ('called without res_type and res_id returns error', (done) => {
+    it ('called with no res_id returns error', (done) => {
       request
-        .del('')
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          done();
-        });
-    });
-
-    it ('called with res_type only (no res_id) returns error', (done) => {
-      request
-        .del('/notes')
+        .del('/api/notes')
         .end((err, res) => {
           expect(res).to.have.status(400);
           done();
